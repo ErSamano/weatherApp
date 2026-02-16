@@ -9,6 +9,7 @@ const conditionNode = document.querySelector('#condition');
 const temperatureNode = document.querySelector('#temperature');
 const windNode = document.querySelector('#wind');
 const humidityNode = document.querySelector('#humidity');
+const forecastNode = document.querySelector('#forecast');
 
 const weatherCodeMap = {
   0: 'Clear sky',
@@ -116,6 +117,8 @@ async function fetchWeather(latitude, longitude, unitSystem) {
   weatherUrl.searchParams.set('latitude', latitude.toString());
   weatherUrl.searchParams.set('longitude', longitude.toString());
   weatherUrl.searchParams.set('current', 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code');
+  weatherUrl.searchParams.set('daily', 'weather_code,temperature_2m_max,temperature_2m_min');
+  weatherUrl.searchParams.set('forecast_days', '3');
   weatherUrl.searchParams.set('temperature_unit', units.temperatureUnit);
   weatherUrl.searchParams.set('wind_speed_unit', units.windSpeedUnit);
 
@@ -127,11 +130,14 @@ async function fetchWeather(latitude, longitude, unitSystem) {
 
   const payload = await response.json();
 
-  if (!payload.current) {
-    throw new Error('Current weather data is missing in API response.');
+  if (!payload.current || !payload.daily) {
+    throw new Error('Weather data is missing in API response.');
   }
 
-  return payload.current;
+  return {
+    current: payload.current,
+    daily: payload.daily
+  };
 }
 
 function renderWeather(city, weather, unitSystem) {
@@ -140,10 +146,44 @@ function renderWeather(city, weather, unitSystem) {
   const location = city.country ? `${area}, ${city.country}` : area;
 
   locationNode.textContent = location;
-  conditionNode.textContent = weatherCodeMap[weather.weather_code] ?? 'Weather condition unavailable';
-  temperatureNode.textContent = `${Math.round(weather.temperature_2m)} ${units.temperatureSymbol}`;
-  windNode.textContent = `${Math.round(weather.wind_speed_10m)} ${units.windSymbol}`;
-  humidityNode.textContent = `${weather.relative_humidity_2m}%`;
+  conditionNode.textContent = weatherCodeMap[weather.current.weather_code] ?? 'Weather condition unavailable';
+  temperatureNode.textContent = `${Math.round(weather.current.temperature_2m)} ${units.temperatureSymbol}`;
+  windNode.textContent = `${Math.round(weather.current.wind_speed_10m)} ${units.windSymbol}`;
+  humidityNode.textContent = `${weather.current.relative_humidity_2m}%`;
 
+  renderForecast(weather.daily, units.temperatureSymbol);
   weatherCard.classList.remove('hidden');
+}
+
+function renderForecast(daily, temperatureSymbol) {
+  const days = daily.time ?? [];
+  const codes = daily.weather_code ?? [];
+  const highs = daily.temperature_2m_max ?? [];
+  const lows = daily.temperature_2m_min ?? [];
+
+  forecastNode.innerHTML = '';
+
+  days.forEach((day, index) => {
+    const date = new Date(day);
+    const dayLabel = date.toLocaleDateString(undefined, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
+
+    const condition = weatherCodeMap[codes[index]] ?? 'Weather condition unavailable';
+    const high = typeof highs[index] === 'number' ? `${Math.round(highs[index])} ${temperatureSymbol}` : '--';
+    const low = typeof lows[index] === 'number' ? `${Math.round(lows[index])} ${temperatureSymbol}` : '--';
+
+    const card = document.createElement('article');
+    card.className = 'forecast-item';
+    card.innerHTML = `
+      <h4>${dayLabel}</h4>
+      <p class="forecast-condition">${condition}</p>
+      <p class="forecast-temp">High: ${high}</p>
+      <p class="forecast-temp">Low: ${low}</p>
+    `;
+
+    forecastNode.append(card);
+  });
 }

@@ -9,7 +9,9 @@
   <body>
     <main class="app">
       <h1>World City Weather</h1>
-      <p class="subtitle">Get the current weather, wind speed, and humidity for any city worldwide.</p>
+      <p class="subtitle">
+        Get the current weather and a 3-day forecast for any city worldwide.
+      </p>
 
       <form id="weather-form" class="search-form" autocomplete="off">
         <label for="city-input">City name</label>
@@ -44,6 +46,9 @@
             <p id="humidity"></p>
           </article>
         </div>
+
+        <h3 class="forecast-title">3-Day Forecast</h3>
+        <div id="forecast" class="forecast-grid"></div>
       </section>
     </main>
 
