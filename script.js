@@ -1,5 +1,6 @@
 const form = document.querySelector('#weather-form');
 const cityInput = document.querySelector('#city-input');
+const unitSystemInput = document.querySelector('#unit-system');
 const statusBox = document.querySelector('#status');
 const weatherCard = document.querySelector('#weather-card');
 
@@ -40,12 +41,28 @@ const weatherCodeMap = {
   99: 'Thunderstorm with heavy hail'
 };
 
+const unitConfig = {
+  metric: {
+    temperatureUnit: 'celsius',
+    windSpeedUnit: 'kmh',
+    temperatureSymbol: '°C',
+    windSymbol: 'km/h'
+  },
+  imperial: {
+    temperatureUnit: 'fahrenheit',
+    windSpeedUnit: 'mph',
+    temperatureSymbol: '°F',
+    windSymbol: 'mph'
+  }
+};
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   const cityName = cityInput.value.trim();
+  const unitSystem = unitSystemInput.value;
 
   if (!cityName) {
-    showStatus('Please enter a US city name.', true);
+    showStatus('Please enter a city name.', true);
     return;
   }
 
@@ -53,15 +70,15 @@ form.addEventListener('submit', async (event) => {
   weatherCard.classList.add('hidden');
 
   try {
-    const city = await findUsCity(cityName);
+    const city = await findCity(cityName);
 
     if (!city) {
-      showStatus('City not found in the United States. Try another search.', true);
+      showStatus('City not found. Try another search.', true);
       return;
     }
 
-    const weather = await fetchWeather(city.latitude, city.longitude);
-    renderWeather(city, weather);
+    const weather = await fetchWeather(city.latitude, city.longitude, unitSystem);
+    renderWeather(city, weather, unitSystem);
     showStatus('');
   } catch (error) {
     console.error(error);
@@ -74,13 +91,12 @@ function showStatus(message, isError = false) {
   statusBox.style.color = isError ? '#8f1d1d' : '#1f4d8f';
 }
 
-async function findUsCity(cityName) {
+async function findCity(cityName) {
   const geoUrl = new URL('https://geocoding-api.open-meteo.com/v1/search');
   geoUrl.searchParams.set('name', cityName);
   geoUrl.searchParams.set('count', '10');
   geoUrl.searchParams.set('language', 'en');
   geoUrl.searchParams.set('format', 'json');
-  geoUrl.searchParams.set('countryCode', 'US');
 
   const response = await fetch(geoUrl);
 
@@ -91,16 +107,17 @@ async function findUsCity(cityName) {
   const payload = await response.json();
   const results = payload.results ?? [];
 
-  return results.find((result) => result.country_code === 'US') ?? null;
+  return results[0] ?? null;
 }
 
-async function fetchWeather(latitude, longitude) {
+async function fetchWeather(latitude, longitude, unitSystem) {
+  const units = unitConfig[unitSystem] ?? unitConfig.metric;
   const weatherUrl = new URL('https://api.open-meteo.com/v1/forecast');
   weatherUrl.searchParams.set('latitude', latitude.toString());
   weatherUrl.searchParams.set('longitude', longitude.toString());
   weatherUrl.searchParams.set('current', 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code');
-  weatherUrl.searchParams.set('temperature_unit', 'fahrenheit');
-  weatherUrl.searchParams.set('wind_speed_unit', 'mph');
+  weatherUrl.searchParams.set('temperature_unit', units.temperatureUnit);
+  weatherUrl.searchParams.set('wind_speed_unit', units.windSpeedUnit);
 
   const response = await fetch(weatherUrl);
 
@@ -117,13 +134,15 @@ async function fetchWeather(latitude, longitude) {
   return payload.current;
 }
 
-function renderWeather(city, weather) {
-  const location = city.admin1 ? `${city.name}, ${city.admin1}` : city.name;
+function renderWeather(city, weather, unitSystem) {
+  const units = unitConfig[unitSystem] ?? unitConfig.metric;
+  const area = city.admin1 ? `${city.name}, ${city.admin1}` : city.name;
+  const location = city.country ? `${area}, ${city.country}` : area;
 
-  locationNode.textContent = `${location}, United States`;
+  locationNode.textContent = location;
   conditionNode.textContent = weatherCodeMap[weather.weather_code] ?? 'Weather condition unavailable';
-  temperatureNode.textContent = `${Math.round(weather.temperature_2m)} °F`;
-  windNode.textContent = `${Math.round(weather.wind_speed_10m)} mph`;
+  temperatureNode.textContent = `${Math.round(weather.temperature_2m)} ${units.temperatureSymbol}`;
+  windNode.textContent = `${Math.round(weather.wind_speed_10m)} ${units.windSymbol}`;
   humidityNode.textContent = `${weather.relative_humidity_2m}%`;
 
   weatherCard.classList.remove('hidden');
