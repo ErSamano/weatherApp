@@ -10,6 +10,8 @@ const temperatureNode = document.querySelector('#temperature');
 const windNode = document.querySelector('#wind');
 const humidityNode = document.querySelector('#humidity');
 const forecastNode = document.querySelector('#forecast');
+const cityVideoNode = document.querySelector('#city-video');
+const cityVideoLabelNode = document.querySelector('#city-video-label');
 
 const weatherCodeMap = {
   0: 'Clear sky',
@@ -152,7 +154,21 @@ function renderWeather(city, weather, unitSystem) {
   humidityNode.textContent = `${weather.current.relative_humidity_2m}%`;
 
   renderForecast(weather.daily, units.temperatureSymbol);
+  renderCityVideo(city);
   weatherCard.classList.remove('hidden');
+}
+
+function renderCityVideo(city) {
+  const locationParts = [city.name, city.admin1, city.country].filter(Boolean);
+  const readableLocation = locationParts.join(', ');
+  const videoSearchTerms = `${readableLocation} city travel in under 2 minutes`;
+  const embedUrl = new URL('https://www.youtube.com/embed');
+
+  embedUrl.searchParams.set('listType', 'search');
+  embedUrl.searchParams.set('list', videoSearchTerms);
+
+  cityVideoNode.src = embedUrl.toString();
+  cityVideoLabelNode.textContent = `YouTube video for ${readableLocation} (short-format search).`;
 }
 
 function renderForecast(daily, temperatureSymbol) {

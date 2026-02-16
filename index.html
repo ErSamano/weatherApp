@@ -49,6 +49,21 @@
 
         <h3 class="forecast-title">3-Day Forecast</h3>
         <div id="forecast" class="forecast-grid"></div>
+
+        <section class="city-video-section" aria-live="polite">
+          <h3 class="forecast-title">City Video</h3>
+          <p id="city-video-label" class="city-video-label"></p>
+          <div class="city-video-frame">
+            <iframe
+              id="city-video"
+              title="City video"
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </section>
       </section>
     </main>
 
