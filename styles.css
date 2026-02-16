@@ -38,12 +38,17 @@ h1 {
   font-weight: 600;
 }
 
+.unit-label {
+  margin-top: 0.8rem;
+}
+
 .search-row {
   display: flex;
   gap: 0.6rem;
 }
 
 input,
+select,
 button {
   font: inherit;
   border-radius: 8px;
@@ -53,6 +58,10 @@ button {
 
 input {
   flex: 1;
+}
+
+select {
+  width: 100%;
 }
 
 button {
