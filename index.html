@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>US City Weather</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <h1>US City Weather</h1>
+      <p class="subtitle">Get the current weather, wind speed, and humidity for any city in the United States.</p>
+
+      <form id="weather-form" class="search-form" autocomplete="off">
+        <label for="city-input">City name</label>
+        <div class="search-row">
+          <input id="city-input" name="city" type="text" placeholder="e.g., Seattle" required />
+          <button type="submit">Get Weather</button>
+        </div>
+      </form>
+
+      <section id="status" class="status" aria-live="polite"></section>
+
+      <section id="weather-card" class="weather-card hidden" aria-live="polite">
+        <h2 id="location"></h2>
+        <p id="condition" class="condition"></p>
+        <div class="metrics">
+          <article>
+            <h3>Temperature</h3>
+            <p id="temperature"></p>
+          </article>
+          <article>
+            <h3>Wind Speed</h3>
+            <p id="wind"></p>
+          </article>
+          <article>
+            <h3>Humidity</h3>
+            <p id="humidity"></p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
