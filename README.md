@@ -1,13 +1,14 @@
 # Weather App
 
-A lightweight client-side web app that lets you search for a **city anywhere in the world** and view the current:
+A lightweight client-side web app that lets you search for a **city anywhere in the world**, choose your preferred unit system, and view:
 
-- Weather condition
-- Temperature (°C or °F)
-- Wind speed (km/h or mph)
-- Humidity (%)
+- Current weather condition
+- Current temperature (°C or °F)
+- Current wind speed (km/h or mph)
+- Current humidity (%)
+- A **3-day weather forecast** with daily condition, high, and low temperatures
 
-The app uses the [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api) to find cities worldwide and the [Open-Meteo Forecast API](https://open-meteo.com/en/docs) for current weather data.
+The app uses the [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api) to find cities worldwide and the [Open-Meteo Forecast API](https://open-meteo.com/en/docs) for current and forecast weather data.
 
 ## Project Structure
 
@@ -49,8 +50,9 @@ No build tools, package managers, or backend are required.
 3. Click **Get Weather**.
 4. The app will:
    - Look up a matching city anywhere in the world.
-   - Request current weather for that location.
-   - Display condition, temperature, wind speed, and humidity.
+   - Request current weather plus a 3-day forecast for that location.
+   - Display current condition, temperature, wind speed, and humidity.
+   - Display three daily forecast cards with condition, high, and low temperatures.
 
 ## Behavior and Error Handling
 
